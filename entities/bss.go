@@ -42,7 +42,7 @@ type BssRes struct {
 	LastPing      string
 	CreatedAt     string
 	UpdatedAt     string
-	UserActive    int8
+	UserActive    int16
 	TransactionId string
 	QrCode        string
 	Email         string

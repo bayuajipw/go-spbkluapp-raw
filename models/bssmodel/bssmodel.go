@@ -17,7 +17,7 @@ func formatTimestamp(nt mysql.NullTime, layout string) string {
 }
 
 func GetAll() []entities.BssRes {
-	rows, err := config.DB.Query("Select bss.*, users.email from bss left join users on bss.user_active = users.id")
+	rows, err := config.DB.Query("Select bss.id, bss.name, bss.address, bss.city, bss.province, bss.longitude, bss.latitude, bss.slot, bss.status, bss.last_ping, bss.created_at, bss.updated_at, bss.user_active, bss.transaction_id, bss.qrcode, users.email from bss left join users on bss.user_active = users.id")
 
 	if err != nil {
 		panic(err)
@@ -38,7 +38,7 @@ func GetAll() []entities.BssRes {
 		var slot, status int8
 		var createdat, updatedat time.Time
 		var lastping mysql.NullTime
-		var useractive int8
+		var useractive sql.NullInt16
 		var transactionid sql.NullString
 		var qrcode sql.NullString
 		var email sql.NullString
@@ -56,7 +56,14 @@ func GetAll() []entities.BssRes {
 		bss.Latitude = latitude
 		bss.Slot = slot
 		bss.Status = status
-		bss.UserActive = useractive
+
+		var useractiveRes int16
+		if useractive.Valid {
+			useractiveRes = useractiveRes
+		} else {
+			useractiveRes = 0
+		}
+		bss.UserActive = useractiveRes
 
 		var qrRes string
 		if qrcode.Valid {
