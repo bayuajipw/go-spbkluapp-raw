@@ -27,7 +27,7 @@
                             <img width="210" src="images/logo/logo.png" alt="#" />
                         </div> -->
                         <div class="center">
-                            <h1 style="color: #fff;">Login Administrator</h1>
+                            <h1 style="color: #fff;">Login Administrator SPBKLU</h1>
                         </div>
                     </div>
                     <div class="login_form">
@@ -63,14 +63,52 @@
                                     <div class="col-md-4">
                                     </div>
                                     <div class="col-md-8 col-lg-8 col-xl-8">
-                                        <label class="label_field hidden">hidden label</label>
-                                        <button type="submit" class="main_bt">Sign In</button>
+                                        <button type="submit" class="btn btn-success">Sign In</button>
+                                        <button type="button" class="btn btn-danger ml-3 " data-toggle="modal"
+                                            data-target="#forgotPassModal">Forgot
+                                            Password</button>
                                     </div>
                                 </div>
                             </fieldset>
                         </form>
                     </div>
                 </div>
+
+                <!-- Forgot Password Modal -->
+                <div class="modal fade" id="forgotPassModal" tabindex="-1" role="dialog"
+                    aria-labelledby="forgotPassModal" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header dash_head">
+                                <h5 class="modal-title" id="forgotPassModalLabel" style="color: #fff;">Input Email Reset
+                                    Password
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" style="color: #fff;">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="forgotPassForm" method="post" enctype="multipart/form-data"
+                                    style="font-size: 0.8rem;">
+                                    <!-- Form fields for adding data -->
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            style="font-size:0.8rem" required>
+                                    </div>
+                                    <!-- Add more fields as needed -->
+                                    <div class="modal-footer">
+                                        <button type="button" id="forgotPassBtn" class="btn btn-sm btn-primary"
+                                            style="font-size: 0.8rem;">Send
+                                            Link Reset Password</button>
+                                        <button type="button" class="btn btn-sm btn-danger" class="close"
+                                            data-dismiss="modal" style="font-size: 0.8rem;">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -79,11 +117,16 @@
         .input-field {
             height: 50px;
             padding: 10px;
-            border: none;
+            border: 1px solid #ccc;
+            /* Thin light grey border */
+            border-radius: 5px;
+            /* Rounded corners */
+            outline: none;
+            /* Remove default focus outline */
         }
 
         .main_bt {
-            float: left !important;
+            font-size: 0.85rem;
         }
     </style>
 
@@ -99,6 +142,56 @@
             }
         }
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#forgotPassBtn").click(function () {
+                // Serialize the form data or get the necessary data in another way
+                var formData = $("#forgotPassForm").serialize();
+
+                // Send an AJAX request to the server
+                $.ajax({
+                    type: "POST",
+                    url: "/send_link", // Change this to the actual server endpoint
+                    data: formData,
+                    success: function (response) {
+                        // Handle the success response
+                        if (response.success) {
+                            // Data added successfully
+                            Toastify({
+                                text: "Please check your email to reset password",
+                                duration: 3000,
+                                close: true,
+                                style: {
+                                    background: "linear-gradient(to right, #7ce1b7, #1ed085)",
+                                },
+                            }).showToast();
+                        } else {
+                            Toastify({
+                                text: "Error: " + response.message,
+                                duration: 3000,
+                                close: true,
+                                style: {
+                                    background: "linear-gradient(to right, #d49090, #ff4748)",
+                                },
+                            }).showToast();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Toastify({
+                            text: "Error: " + xhr.responseText,
+                            duration: 3000,
+                            close: true,
+                            style: {
+                                background: "linear-gradient(to right, #d49090, #ff4748)",
+                            },
+                        }).showToast();
+                    },
+                });
+            });
+        });
+    </script>
+
 
     <!-- jQuery -->
     {{ template "Footerjs"}}

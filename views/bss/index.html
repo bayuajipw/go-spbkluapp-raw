@@ -6,12 +6,12 @@
    <div class="full_container">
       <div class="inner_container">
          <!-- Sidebar  -->
-         {{template "Sidebar"}}
+         {{template "Sidebar" .}}
          <!-- end sidebar -->
          <!-- right content -->
          <div id="content">
             <!-- topbar -->
-            {{template "Navbar"}}
+            {{template "Navbar" .}}
 
             <!-- end topbar -->
             <!-- dashboard inner -->
@@ -31,8 +31,10 @@
                            <div class="full graph_head">
                               <div class="heading1 margin_0">
                                  <!-- <h2>Hover Table</h2> -->
-                                 <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#addDataModal"
-                                    style="font-size:0.8rem;">Add Data</button>
+                                 {{if or (eq .role 0) (eq .role 1)}}
+                                 <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#addBssModal"
+                                    style="font-size:0.8rem;">Add BSS</button>
+                                 {{end}}
                                  <button id="reload-button" class="btn btn-sm btn-primary"
                                     style="font-size:0.8rem;">Reload Table</button>
                               </div>
@@ -45,6 +47,7 @@
                                     <thead style="font-size:0.7rem;">
                                        <tr>
                                           <th>No</th>
+                                          <th style="padding-left: 20px; padding-right: 50px;">Action</th>
                                           <th>Nama</th>
                                           <th>Alamat</th>
                                           <th>Longitude</th>
@@ -57,7 +60,6 @@
                                           <th>User Active</th>
                                           <th>QR Code</th>
                                           <th>Transaction ID</th>
-                                          <th>Action</th>
                                        </tr>
                                     </thead>
                                     <tbody>
@@ -68,6 +70,54 @@
                            </div>
                         </div>
                      </div>
+
+
+                     <div class="col-md-12">
+                        <div id="lockerTable" class="white_shd full margin_bottom_30" style="display: none;">
+                           <!-- Edit Modal -->
+                           <div class="full graph_head">
+                              <div class="heading1 margin_0" style="display: flex; align-items: center;">
+                                 <h2 id="locker-title" style="margin-right: 10px;"></h2>
+                                 {{if or (eq .role 0) (eq .role 1)}}
+                                 <button class="btn btn-sm btn-success" id="addlocker-button"
+                                    style="font-size:0.8rem;">Add Locker</button>
+                                 {{end}}
+                                 <button id="reloadlocker-button" class="btn btn-sm btn-primary ml-1"
+                                    style="font-size: 0.8rem;">Reload Table</button>
+                              </div>
+
+                           </div>
+                           <div class="padding_infor_info">
+                              <div class="table-responsive-sm">
+                                 <table id="locker-table" class="table table-hover" style="font-size:0.75rem;"
+                                    width="100%" cellspacing="0">
+                                    <thead style="font-size:0.7rem;">
+                                       <tr>
+                                          <th>No</th>
+                                          <th style="padding-left: 20px; padding-right: 50px;">Action</th>
+                                          <th>Locker Id</th>
+                                          <!-- <th>Bss Name</th> -->
+                                          <th>Locker Name</th>
+                                          <th>Locker Number</th>
+                                          <th>Status</th>
+                                          <th>Swapping Out</th>
+                                          <th>SoC</th>
+                                          <th>SoH</th>
+                                          <th>Temp</th>
+                                          <th>Stay Hour</th>
+                                          <th>Created At</th>
+                                          <th>Updated At</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                 </table>
+
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
 
                      <!-- Auto hide div edit form -->
 
@@ -80,85 +130,89 @@
                                     <div class="col-md-4">
                                        <!-- Form fields for adding data -->
                                        <div class="form-group">
-                                          <label for="name">Id BSS:</label>
-                                          <input type="text" class="form-control" id="rowId" name="rowId"
+                                          <label for="edit-rowId">Id BSS:</label>
+                                          <input type="text" class="form-control" id="edit-rowId" name="edit-rowId"
                                              style="font-size:0.8rem" readonly>
                                        </div>
                                        <div class="form-group">
-                                          <label for="name">Name:</label>
-                                          <input type="text" class="form-control" id="name" name="name"
+                                          <label for="edit-name">Name:</label>
+                                          <!-- <input type="text" class="form-control" id="edit-name" name="edit-name"
+                                             style="font-size:0.8rem" required> -->
+                                          <input type="text" class="form-control" id="edit-name" name="edit-name"
+                                             style="font-size: 0.8rem" pattern="[a-zA-Z0-9-_]+"
+                                             title="Input should contain only alphanumeric characters, hyphen (-), or underscore (_)."
+                                             required oninput="validateInput(this)">
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="edit-address">Address:</label>
+                                          <input type="text" class="form-control" id="edit-address" name="edit-address"
                                              style="font-size:0.8rem" required>
                                        </div>
                                        <div class="form-group">
-                                          <label for="address">Address:</label>
-                                          <input type="text" class="form-control" id="address" name="address"
+                                          <label for="edit-city">City:</label>
+                                          <input type="text" class="form-control" id="edit-city" name="edit-city"
                                              style="font-size:0.8rem" required>
                                        </div>
                                        <div class="form-group">
-                                          <label for="city">City:</label>
-                                          <input type="text" class="form-control" id="city" name="city"
-                                             style="font-size:0.8rem" required>
-                                       </div>
-                                       <div class="form-group">
-                                          <label for="province">Province:</label>
-                                          <input type="text" class="form-control" id="province" name="province"
-                                             style="font-size:0.8rem" required>
+                                          <label for="edit-province">Province:</label>
+                                          <input type="text" class="form-control" id="edit-province"
+                                             name="edit-province" style="font-size:0.8rem" required>
                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                        <!-- Form fields for adding data -->
                                        <div class="form-group">
-                                          <label for="longitude">Longitude:</label>
-                                          <input type="number" class="form-control" id="longitude" name="longitude"
-                                             style="font-size:0.8rem" required>
+                                          <label for="edit-longitude">Longitude:</label>
+                                          <input type="number" step="any" class="form-control" id="edit-longitude"
+                                             name="edit-longitude" style="font-size:0.8rem" required>
                                        </div>
                                        <div class="form-group">
-                                          <label for="latitude">Latitude:</label>
-                                          <input type="number" class="form-control" id="latitude" name="latitude"
-                                             style="font-size:0.8rem" required>
+                                          <label for="edit-latitude">Latitude:</label>
+                                          <input type="number" step="any" class="form-control" id="edit-latitude"
+                                             name="edit-latitude" style="font-size:0.8rem" required>
                                        </div>
                                        <div class="form-group">
-                                          <label for="slot">Slot:</label>
-                                          <input type="number" class="form-control" id="slot" name="slot"
+                                          <label for="edit-status">Status:</label>
+                                          <input type="number" class="form-control" id="edit-status" name="edit-status"
                                              style="font-size:0.8rem" min=0 max=20 required>
                                        </div>
                                        <div class="form-group">
-                                          <label for="status">Status:</label>
-                                          <input type="number" class="form-control" id="status" name="status"
-                                             style="font-size:0.8rem" min=0 max=20 required>
-                                       </div>
-                                       <div class="form-group">
-                                          <label for="lastping">Last Ping:</label>
-                                          <input type="text" class="form-control" id="lastping" name="lastping"
+                                          <label for="edit-slot">Locker Slot:</label>
+                                          <input type="text" class="form-control" id="edit-slot" name="edit-slot"
                                              style="font-size:0.8rem" disabled>
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="edit-lastping">Last Ping:</label>
+                                          <input type="text" class="form-control" id="edit-lastping"
+                                             name="edit-lastping" style="font-size:0.8rem" disabled>
                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                        <!-- Form fields for adding data -->
                                        <div class="form-group">
-                                          <label for="created">Created At:</label>
-                                          <input type="text" class="form-control" id="created" name="created"
+                                          <label for="edit-useractive">User Active:</label>
+                                          <input type="text" class="form-control" id="edit-useractive"
+                                             name="edit-useractive" style="font-size:0.8rem" disabled>
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="edit-qrcode">QR Code:</label>
+                                          <input type="text" class="form-control" id="edit-qrcode" name="edit-qrcode"
                                              style="font-size:0.8rem" disabled>
                                        </div>
                                        <div class="form-group">
-                                          <label for="updated">Updated At:</label>
-                                          <input type="text" class="form-control" id="updated" name="updated"
+                                          <label for="edit-transactionid">Transaction ID:</label>
+                                          <input type="text" class="form-control" id="edit-transactionid"
+                                             name="edit-transactionid" style="font-size:0.8rem" disabled>
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="edit-created">Created At:</label>
+                                          <input type="text" class="form-control" id="edit-created" name="edit-created"
                                              style="font-size:0.8rem" disabled>
                                        </div>
                                        <div class="form-group">
-                                          <label for="useractive">User Active:</label>
-                                          <input type="text" class="form-control" id="useractive" name="useractive"
+                                          <label for="edit-updated">Updated At:</label>
+                                          <input type="text" class="form-control" id="edit-updated" name="edit-updated"
                                              style="font-size:0.8rem" disabled>
-                                       </div>
-                                       <div class="form-group">
-                                          <label for="qrcode">QR Code:</label>
-                                          <input type="text" class="form-control" id="qrcode" name="qrcode"
-                                             style="font-size:0.8rem" disabled>
-                                       </div>
-                                       <div class="form-group">
-                                          <label for="transactionid">Transaction ID:</label>
-                                          <input type="text" class="form-control" id="transactionid"
-                                             name="transactionid" style="font-size:0.8rem" disabled>
                                        </div>
                                     </div>
 
@@ -169,6 +223,7 @@
                                        Data</button>
                                  </div>
                               </form>
+
                            </div>
                         </div>
                      </div>
@@ -180,14 +235,13 @@
                {{template "Footer"}}
             </div>
 
-
-            <!-- Add Modal -->
-            <div class="modal fade" id="addDataModal" tabindex="-1" role="dialog" aria-labelledby="addDataModalLabel"
+            <!-- Add BSS Modal -->
+            <div class="modal fade" id="addBssModal" tabindex="-1" role="dialog" aria-labelledby="addBssModalLabel"
                aria-hidden="true">
                <div class="modal-dialog" role="document">
                   <div class="modal-content">
                      <div class="modal-header dash_head">
-                        <h5 class="modal-title" id="addDataModalLabel" style="color: #fff;">Add Data BSS</h5>
+                        <h5 class="modal-title" id="addBssModalLabel" style="color: #fff;">Add Data BSS</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                            <span aria-hidden="true" style="color: #fff;">&times;</span>
                         </button>
@@ -195,48 +249,54 @@
                      <div class="modal-body">
                         <form id="addDataForm" style="font-size: 0.8rem;">
                            <!-- Form fields for adding data -->
-                           <div class="form-group">
-                              <label for="name">Name:</label>
-                              <input type="text" class="form-control" id="name" name="name" style="font-size:0.8rem"
-                                 required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-name">Name:</label></div>
+                              <div class="col-md-8">
+                                 <!-- <input type="text" class="form-control" id="add-name" name="add-name"
+                                    style="font-size:0.8rem" required> -->
+                                 <input type="text" class="form-control" id="add-name" name="add-name"
+                                    style="font-size: 0.8rem" pattern="[a-zA-Z0-9-_]+"
+                                    title="Input should contain only alphanumeric characters, hyphen (-), or underscore (_)."
+                                    required oninput="validateInput(this)">
+                              </div>
                            </div>
-                           <div class="form-group">
-                              <label for="address">Address:</label>
-                              <input type="text" class="form-control" id="address" name="address"
-                                 style="font-size:0.8rem" required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-address">Address:</label></div>
+                              <div class="col-md-8"><input type="text" class="form-control" id="add-address"
+                                    name="add-address" style="font-size:0.8rem" required></div>
                            </div>
-                           <div class="form-group">
-                              <label for="city">City:</label>
-                              <input type="text" class="form-control" id="city" name="city" style="font-size:0.8rem"
-                                 required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-city">City:</label></div>
+                              <div class="col-md-8"><input type="text" class="form-control" id="add-city"
+                                    name="add-city" style="font-size:0.8rem" required></div>
                            </div>
-                           <div class="form-group">
-                              <label for="province">Province:</label>
-                              <input type="text" class="form-control" id="province" name="province"
-                                 style="font-size:0.8rem" required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-province">Province:</label></div>
+                              <div class="col-md-8"><input type="text" class="form-control" id="add-province"
+                                    name="add-province" style="font-size:0.8rem" required></div>
                            </div>
-                           <div class="form-group">
-                              <label for="longitude">Longitude:</label>
-                              <input type="number" class="form-control" id="longitude" name="longitude"
-                                 style="font-size:0.8rem" required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-longitude">Longitude:</label></div>
+                              <div class="col-md-8"><input type="number" class="form-control" id="add-longitude"
+                                    name="add-longitude" step="any" style="font-size:0.8rem" required></div>
                            </div>
-                           <div class="form-group">
-                              <label for="latitude">Latitude:</label>
-                              <input type="number" class="form-control" id="latitude" name="latitude"
-                                 style="font-size:0.8rem" required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-latitude">Latitude:</label></div>
+                              <div class="col-md-8"><input type="number" class="form-control" id="add-latitude"
+                                    name="add-latitude" step="any" style="font-size:0.8rem" required></div>
                            </div>
-                           <div class="form-group">
-                              <label for="slot">Slot:</label>
-                              <input type="number" class="form-control" id="slot" name="slot" style="font-size:0.8rem"
-                                 min=0 max=20 required>
+                           <div class="row form-group">
+                              <div class="col-md-4"><label for="add-slot">Slot:</label></div>
+                              <div class="col-md-8"><input type="number" class="form-control" id="add-slot"
+                                    name="add-slot" style="font-size:0.8rem" min=0 max=20 required></div>
                            </div>
                            <!-- Add more fields as needed -->
-                           <div style="margin-top: 20px; margin-bottom: 30px;">
+                           <div class="modal-footer">
                               <button type="submit" class="btn btn-sm btn-primary" style="font-size: 0.8rem;">Submit
                                  Data</button>
                               <button type="button" class="btn btn-sm btn-danger" class="close" data-dismiss="modal"
                                  style="font-size: 0.8rem;">Cancel</button>
-                              <div>
+                           </div>
                         </form>
                      </div>
                   </div>
@@ -251,12 +311,23 @@
    {{template "Footerjs"}}
 
    <script>
+      function validateInput(inputElement) {
+         var inputValue = inputElement.value;
+         var pattern = /^[a-zA-Z0-9-_]+$/;
+
+         if (!pattern.test(inputValue)) {
+            inputElement.setCustomValidity('Input should contain only alphanumeric characters, hyphen (-), or underscore (_).');
+         } else {
+            errorMessageElement.textContent = '';
+            inputElement.setCustomValidity('');
+         }
+      }
+   </script>
+
+   <script>
       // datatable
       var dataTable;
       $(document).ready(function () {
-         var selectedRowId; // Variable to store the selected row's ID
-         var selectedRowName; // Variable to store the selected row's Name
-
          dataTable = $('#data-table').DataTable({
             paging: true, // Enable pagination
             searching: true, // Enable searching
@@ -264,10 +335,32 @@
             ajax: {
                url: '/bss_ajax', // Replace with your server endpoint
                type: 'GET', // Use POST or GET as appropriate
-               dataSrc: '', // Specify the property that contains the data in the response
+               dataSrc: function (response) {
+                  var role = response.role
+                  if (response.data === null) {
+                     return [];
+                  } else {
+                     return response.data;
+                  }
+               },
             },
             columns: [ // Define your table columns here
                { data: 'No' },
+               {
+                  // Define the column for the "Delete" button
+                  data: null,
+                  render: function (data, type, row) {
+                     var buttonHTML = '';
+
+                     // Check the "role" value
+                     if (dataTable.ajax.json().role === 0 || dataTable.ajax.json().role === 1) {
+                        buttonHTML += '<button type="button" class="btn btn-sm btn-info edit-button" data-id="' + row.Id + '" data-name="' + row.Name + '" data-address="' + row.Address + '" data-city="' + row.City + '" data-province="' + row.Province + '"  data-longitude="' + row.Longitude + '"  data-latitude="' + row.Latitude + '"  data-slot="' + row.Slot + '"   data-status="' + row.Status + '"  data-lastping="' + row.LastPing + '"  data-created="' + row.CreatedAt + '"  data-updated="' + row.UpdatedAt + '"  data-useractive="' + row.Email + '" data-transactionid="' + row.TransactionId + '" data-qrcode="' + row.QrCode + '" style="font-size:0.75rem; margin-right:1px; margin-bottom:1px"><i class="fa fa-pencil"></i> Edit</button><button type="button" class="btn btn-sm btn-warning locker-button" data-id="' + row.Id + '" data-name="' + row.Name + '" style="font-size:0.75rem; margin-right:1px; margin-bottom:1px; color:white"><i class="fa fa-table"></i> Show Locker</button><button type="button" class="btn btn-sm btn-danger delete-button" data-id="' + row.Id + '" data-name="' + row.Name + '" style="font-size:0.75rem; margin-bottom:1px"><i class="fa fa-trash"></i> Delete</button>';
+                     } else {
+                        buttonHTML += 'No Action'
+                     }
+                     return buttonHTML;
+                  }
+               },
                { data: 'Name' },
                {
                   data: null, // Use null to indicate custom rendering
@@ -285,14 +378,7 @@
                //{ data: 'UpdatedAt' },
                { data: 'Email' },
                { data: 'QrCode' },
-               { data: 'TransactionId' },
-               {
-                  // Define the column for the "Delete" button
-                  data: null,
-                  render: function (data, type, row) {
-                     return '<button type="button" class="btn btn-sm btn-info edit-button" data-id="' + row.Id + '" data-name="' + row.Name + '" data-address="' + row.Address + '" data-city="' + row.City + '" data-province="' + row.Province + '"  data-longitude="' + row.Longitude + '"  data-latitude="' + row.Latitude + '"  data-slot="' + row.Slot + '"   data-status="' + row.Status + '"  data-lastping="' + row.LastPing + '"  data-created="' + row.CreatedAt + '"  data-updated="' + row.UpdatedAt + '"  data-useractive="' + row.Email + '" data-transactionid="' + row.TransactionId + '" data-qrcode="' + row.QrCode + '" style="font-size:0.75rem; margin-right:1px"><i class="fa fa-pencil"></i></button><button type="button" class="btn btn-sm btn-danger delete-button" data-id="' + row.Id + '" data-name="' + row.Name + '" style="font-size:0.75rem"><i class="fa fa-trash"></i></button>';
-                  }
-               }
+               { data: 'TransactionId' }
             ],
             dom: 'lBfrtip', // Include the Buttons extension
             buttons: [
@@ -309,11 +395,11 @@
 
          // Handle the "Delete" button click in the DataTable
          $('#data-table').on('click', '.delete-button', function () {
-            selectedRowId = $(this).data('id'); // Store the row's ID
-            selectedRowName = $(this).data('name'); // Store the row's Name
+            selectedBssDeleteId = $(this).data('id'); // Store the row's ID
+            selectedBssDeleteName = $(this).data('name'); // Store the row's Name
             Swal.fire({
                title: 'Delete Record?',
-               text: 'Are you sure you want to delete ' + selectedRowName + '?',
+               text: 'Are you sure you want to delete ' + selectedBssDeleteName + '?',
                icon: 'warning',
                showCancelButton: true,
                confirmButtonColor: '#ff4748',
@@ -326,14 +412,15 @@
                   $.ajax({
                      url: '/bss_delete', // Replace with the URL for your server-side delete endpoint
                      type: 'POST',
-                     data: { id: selectedRowId },
+                     data: { id: selectedBssDeleteId },
                      success: function (response) {
                         if (response.success) {
                            // Reload the DataTable to reflect the deleted record
                            dataTable.ajax.reload();
                            $('#editForm').hide();
+                           $('#lockerTable').hide();
                            Toastify({
-                              text: "Data " + selectedRowName + " deleted successfully",
+                              text: "Data " + selectedBssDeleteName + " deleted successfully",
                               duration: 3000, // Duration in milliseconds
                               close: true, // Show close button
                               style: {
@@ -368,8 +455,8 @@
          });
 
          $('#data-table').on('click', '.edit-button', function () {
-            selectedRowId = $(this).data('id'); // Store the row's ID
-            selectedRowName = $(this).data('name'); // Store the row's Name
+            selectedRowBssId = $(this).data('id'); // Store the row's ID
+            selectedRowBssName = $(this).data('name'); // Store the row's Name
             selectedRowAddress = $(this).data('address');
             selectedRowCity = $(this).data('city');
             selectedRowProvince = $(this).data('province');
@@ -384,29 +471,231 @@
             selectedRowTransactionId = $(this).data('transactionid');
             selectedRowQrCode = $(this).data('qrcode');
 
-            $('#rowId').val(selectedRowId);
-            $('#name').val(selectedRowName);
-            $('#address').val(selectedRowAddress);
-            $('#city').val(selectedRowCity);
-            $('#province').val(selectedRowProvince);
-            $('#longitude').val(selectedRowLongitude);
-            $('#latitude').val(selectedRowLatitude);
-            $('#slot').val(selectedRowSlot);
-            $('#status').val(selectedRowStatus);
-            $('#lastping').val(selectedRowLastping);
-            $('#created').val(selectedRowCreated);
-            $('#updated').val(selectedRowUpdated);
-            $('#useractive').val(selectedRowUserActive);
-            $('#transactionid').val(selectedRowTransactionId);
-            $('#qrcode').val(selectedRowQrCode);
+            $('#edit-rowId').val(selectedRowBssId);
+            $('#edit-name').val(selectedRowBssName);
+            $('#edit-address').val(selectedRowAddress);
+            $('#edit-city').val(selectedRowCity);
+            $('#edit-province').val(selectedRowProvince);
+            $('#edit-longitude').val(selectedRowLongitude);
+            $('#edit-latitude').val(selectedRowLatitude);
+            $('#edit-slot').val(selectedRowSlot);
+            $('#edit-status').val(selectedRowStatus);
+            $('#edit-lastping').val(selectedRowLastping);
+            $('#edit-created').val(selectedRowCreated);
+            $('#edit-updated').val(selectedRowUpdated);
+            $('#edit-useractive').val(selectedRowUserActive);
+            $('#edit-transactionid').val(selectedRowTransactionId);
+            $('#edit-qrcode').val(selectedRowQrCode);
 
             // Show the edit form
             $('#editForm').show();
+            $('#lockerTable').hide();
          });
 
       });
    </script>
 
+   <script>
+      $('#data-table').on('click', '.locker-button', function () {
+         var selectedBssShowName;
+         var selectedBssShowId;
+         selectedBssShowName = $(this).data('name');
+         selectedBssShowId = $(this).data('id');
+         $('#editForm').hide();
+         $('#lockerTable').show();
+         document.getElementById("locker-title").innerHTML = "List Locker BSS: " + selectedBssShowName;
+         //alert(selectedRowName)
+         var dataTable;
+
+         $("#locker-table").dataTable().fnDestroy();
+
+         $(document).ready(function () {
+            dataTable = $('#locker-table').DataTable({
+               bAutoWidth: false,
+               paging: true, // Enable pagination
+               searching: true, // Enable searching
+               processing: true, // Show a loading indicator
+               //ordering: false,
+               //order: [[15, 'desc']],
+               ajax: {
+                  url: '/locker_ajax?bss_id=' + selectedBssShowId, // Replace with your server endpoint
+                  type: 'GET', // Use POST or GET as appropriate
+                  //dataSrc: 'data', // Specify the property that contains the data in the response
+                  dataSrc: function (response) {
+                     var role = response.role
+                     if (response.data === null) {
+                        return [];
+                     } else {
+                        return response.data;
+                     }
+                  },
+               },
+               columns: [ // Define your table columns here
+                  { data: 'No' },
+                  {
+                     // Define the column for the "Delete" button
+                     data: null,
+                     render: function (data, type, row) {
+                        var buttonHTML = '';
+
+                        // Check the "role" value
+                        if (dataTable.ajax.json().role === 0 || dataTable.ajax.json().role === 1) {
+                           buttonHTML += '<button type="button" class="btn btn-sm btn-danger deletelocker-button" data-id="' + row.Id + '" data-name="' + row.Name + '" style="font-size:0.75rem; margin-bottom:1px"><i class="fa fa-trash"></i> Delete</button>';
+                        } else {
+                           buttonHTML += 'No Action'
+                        }
+                        return buttonHTML;
+                     }
+                  },
+                  { data: 'Id' },
+                  //{ data: 'BssName' },
+                  { data: 'Name' },
+                  { data: 'LockerNumber' },
+                  { data: 'Status' },
+                  { data: 'SwappingOut' },
+                  { data: 'Soc' },
+                  { data: 'Soh' },
+                  { data: 'Temp' },
+                  { data: 'StayHour' },
+                  { data: 'CreatedAt' },
+                  { data: 'UpdatedAt' },
+               ],
+
+               language: {
+                  emptyTable: "No data available in the table"
+               },
+               dom: 'lBfrtip', // Include the Buttons extension
+               buttons: [
+                  {
+                     extend: 'csv', // Excel button
+                     text: 'Export to CSV', // Set custom text
+                  }
+               ]
+            });
+         });
+
+         $('#reloadlocker-button').on('click', function () {
+            dataTable.ajax.reload();
+         });
+
+         // Handle the "Delete" button click in the DataTable
+         $('#locker-table').on('click', '.deletelocker-button', function () {
+            selectedLockerDeleteId = $(this).data('id'); // Store the row's ID
+            selectedLockerDeleteName = $(this).data('name'); // Store the row's Name
+            Swal.fire({
+               title: 'Delete Record?',
+               text: 'Are you sure you want to delete ' + selectedLockerDeleteName + '?',
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#ff4748',
+               cancelButtonColor: '#36a9e2',
+               confirmButtonText: 'Yes, delete it!',
+               cancelButtonText: 'Cancel'
+            }).then((result) => {
+               if (result.isConfirmed) {
+                  // Send an AJAX request to delete the record
+                  $.ajax({
+                     url: '/locker_delete', // Replace with the URL for your server-side delete endpoint
+                     type: 'POST',
+                     data: { id: selectedLockerDeleteId },
+                     success: function (response) {
+                        if (response.success) {
+                           // Reload the DataTable to reflect the deleted record
+                           dataTable.ajax.reload();
+                           Toastify({
+                              text: "Data " + selectedLockerDeleteName + " deleted successfully",
+                              duration: 3000, // Duration in milliseconds
+                              close: true, // Show close button
+                              style: {
+                                 background: "linear-gradient(to right, #7ce1b7, #1ed085)",
+                              },
+                           }).showToast();
+                        } else {
+                           Toastify({
+                              text: response.message,
+                              duration: 3000, // Duration in milliseconds
+                              close: true, // Show close button
+                              style: {
+                                 background: "linear-gradient(to right, #d49090, #ff4748)",
+                              },
+                           }).showToast();
+                        }
+                     },
+                     error: function () {
+                        Toastify({
+                           text: "Error: An error occurred while deleting the record.",
+                           duration: 3000, // Duration in milliseconds
+                           close: true, // Show close button
+                           style: {
+                              background: "linear-gradient(to right, #d49090, #ff4748)",
+                           },
+                        }).showToast();
+                     }
+                  });
+               }
+            });
+         });
+
+
+         $('#addlocker-button').on('click', function () {
+            Swal.fire({
+               title: 'Add Locker?',
+               text: 'Are you sure you want to add locker ' + selectedBssShowName + '?',
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonColor: '#36a9e2',
+               cancelButtonColor: '#ff4748',
+               confirmButtonText: 'Yes, add locker!',
+               cancelButtonText: 'Cancel'
+            }).then((result) => {
+               if (result.isConfirmed) {
+                  // Send an AJAX request to delete the record
+                  $.ajax({
+                     url: '/locker_add', // Replace with the URL for your server-side delete endpoint
+                     type: 'POST',
+                     data: { id: selectedBssShowId },
+                     success: function (response) {
+                        if (response.success) {
+                           // Reload the DataTable to reflect the deleted record
+                           dataTable.ajax.reload();
+                           Toastify({
+                              text: "Locker " + selectedBssShowName + " added successfully",
+                              duration: 3000, // Duration in milliseconds
+                              close: true, // Show close button
+                              style: {
+                                 background: "linear-gradient(to right, #7ce1b7, #1ed085)",
+                              },
+                           }).showToast();
+                        } else {
+                           Toastify({
+                              text: response.message,
+                              duration: 3000, // Duration in milliseconds
+                              close: true, // Show close button
+                              style: {
+                                 background: "linear-gradient(to right, #d49090, #ff4748)",
+                              },
+                           }).showToast();
+                        }
+                     },
+                     error: function () {
+                        Toastify({
+                           text: "Error: An error occurred while adding locker.",
+                           duration: 3000, // Duration in milliseconds
+                           close: true, // Show close button
+                           style: {
+                              background: "linear-gradient(to right, #d49090, #ff4748)",
+                           },
+                        }).showToast();
+                     }
+                  });
+               }
+            });
+         });
+
+      });
+
+
+   </script>
 
    <script>
       // add data
@@ -434,7 +723,7 @@
                            background: "linear-gradient(to right, #7ce1b7, #1ed085)",
                         },
                      }).showToast();
-                     $('#addDataModal').modal('hide'); // Close the modal
+                     $('#addBssModal').modal('hide'); // Close the modal
                      dataTable.ajax.reload(); // Load the table
                   } else {
                      // Handle any server-side validation errors
@@ -492,9 +781,9 @@
                            background: "linear-gradient(to right, #7ce1b7, #1ed085)",
                         },
                      }).showToast();
-                     $('#addDataModal').modal('hide'); // Close the modal
+                     $('#addBssModal').modal('hide'); // Close the modal
                      dataTable.ajax.reload(); // Load the table
-                     $('#editForm').hide();
+                     //$('#editForm').hide();
                   } else {
                      // Handle any server-side validation errors
                      Toastify({
@@ -527,6 +816,10 @@
          });
       });
    </script>
+
+
+
+
 
 </body>
 
